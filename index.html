@@ -169,40 +169,88 @@
     <script>
 
         function playMelody() {
-            // Créer un synthétiseur avec un peu de reverb pour un son plus agréable
-            const reverb = new Tone.Reverb({
-                decay: 2.5,
-                wet: 0.4
+            // Créer un synthétiseur de style 8-bit (chiptune)
+            const distortion = new Tone.Distortion({
+                distortion: 0.2,
+                wet: 0.2
             }).toDestination();
             
+            const filter = new Tone.Filter({
+                type: "lowpass",
+                frequency: 2200,
+                Q: 1
+            }).connect(distortion);
+            
+            // Synthé style 8-bit avec onde carrée
             const synth = new Tone.Synth({
                 oscillator: {
-                    type: "triangle"
+                    type: "square" // Onde carrée pour le son rétro 8-bit
                 },
                 envelope: {
-                    attack: 0.05,
-                    decay: 0.2,
-                    sustain: 0.4,
-                    release: 1.5
+                    attack: 0.01,  // Attaque très courte
+                    decay: 0.1,    // Decay rapide
+                    sustain: 0.3,  // Sustain modéré
+                    release: 0.1   // Release court (son qui s'arrête net)
                 }
-            }).connect(reverb);
+            }).connect(filter);
             
-            // Définir les notes de la mélodie et leurs durées
+            // Mélodie de style jeu vidéo rétro
             const melody = [
-                { note: "G4", duration: "8n", time: 0 },
-                { note: "E4", duration: "8n", time: 0.25 },
-                { note: "G4", duration: "8n", time: 0.5 },
-                { note: "A4", duration: "8n", time: 0.75 },
-                { note: "B4", duration: "4n", time: 1.0 },
-                { note: "A4", duration: "8n", time: 1.5 },
+                { note: "C5", duration: "16n", time: 0 },
+                { note: "C5", duration: "16n", time: 0.125 },
+                { note: "G5", duration: "8n", time: 0.25 },
+                { note: "E5", duration: "8n", time: 0.5 },
+                
+                { note: "A4", duration: "16n", time: 0.75 },
+                { note: "B4", duration: "16n", time: 0.875 },
+                { note: "C5", duration: "8n", time: 1.0 },
+                { note: "G4", duration: "8n", time: 1.25 },
+                
+                { note: "E4", duration: "16n", time: 1.5 },
+                { note: "F4", duration: "16n", time: 1.625 },
                 { note: "G4", duration: "8n", time: 1.75 },
-                { note: "E4", duration: "8n", time: 2.0 },
-                { note: "D4", duration: "8n", time: 2.25 },
-                { note: "E4", duration: "8n", time: 2.5 },
-                { note: "G4", duration: "8n", time: 2.75 },
-                { note: "E4", duration: "4n", time: 3.0 },
-                { note: "D4", duration: "4n", time: 3.5 },
-                { note: "C4", duration: "2n", time: 4.0 }
+                { note: "C4", duration: "8n", time: 2.0 },
+                
+                { note: "C5", duration: "16n", time: 2.25 },
+                { note: "C5", duration: "16n", time: 2.375 },
+                { note: "G5", duration: "8n", time: 2.5 },
+                { note: "E5", duration: "8n", time: 2.75 },
+                
+                { note: "A4", duration: "16n", time: 3.0 },
+                { note: "B4", duration: "16n", time: 3.125 },
+                { note: "C5", duration: "8n", time: 3.25 },
+                { note: "G4", duration: "8n", time: 3.5 },
+                
+                { note: "E5", duration: "16n", time: 3.75 },
+                { note: "D5", duration: "16n", time: 3.875 },
+                { note: "C5", duration: "4n", time: 4.0 }
+            ];
+            
+            // Ajout d'un "bass line" 8-bit caractéristique des jeux vidéo
+            const bassSynth = new Tone.Synth({
+                oscillator: {
+                    type: "square",
+                    width: 0.5
+                },
+                envelope: {
+                    attack: 0.01,
+                    decay: 0.1,
+                    sustain: 0.3,
+                    release: 0.1
+                },
+                volume: -8 // Volume plus bas que la mélodie
+            }).connect(filter);
+            
+            const bassLine = [
+                { note: "C3", duration: "8n", time: 0 },
+                { note: "C3", duration: "8n", time: 0.5 },
+                { note: "G2", duration: "8n", time: 1.0 },
+                { note: "G2", duration: "8n", time: 1.5 },
+                { note: "A2", duration: "8n", time: 2.0 },
+                { note: "A2", duration: "8n", time: 2.5 },
+                { note: "F2", duration: "8n", time: 3.0 },
+                { note: "G2", duration: "8n", time: 3.5 },
+                { note: "C3", duration: "4n", time: 4.0 }
             ];
             
             // Obtenir le temps actuel comme point de référence
@@ -214,6 +262,15 @@
                     noteInfo.note,
                     noteInfo.duration,
                     now + noteInfo.time
+                );
+            });
+            
+            // Planifier chaque note de la basse
+            bassLine.forEach(bassInfo => {
+                bassSynth.triggerAttackRelease(
+                    bassInfo.note,
+                    bassInfo.duration,
+                    now + bassInfo.time
                 );
             });
         }
