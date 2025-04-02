@@ -16,9 +16,10 @@
             --popover-foreground: hsl(222.2, 84%, 4.9%);
             --primary: hsl(222.2, 47.4%, 11.2%);
             --primary-foreground: hsl(210, 40%, 98%);
-            --secondary: hsl(210, 40%, 96.1%);
+           /* --secondary: hsl(210, 40%, 96.1%);*/
+            --secondary: hsl(155, 49%, 49%);
             --secondary-foreground: hsl(222.2, 47.4%, 11.2%);
-            --muted: hsl(210, 40%, 96.1%);
+            --muted: hsl(278, 40%, 96%);
             --muted-foreground: hsl(215.4, 16.3%, 46.9%);
             --accent: hsl(210, 40%, 96.1%);
             --accent-foreground: hsl(222.2, 47.4%, 11.2%);
@@ -30,43 +31,19 @@
             --radius: 0.5rem;
         }
 
-        /* Mode sombre (optionnel) */
-        .dark {
-            --background: hsl(222.2, 84%, 4.9%);
-            --foreground: hsl(210, 40%, 98%);
-            --card: hsl(222.2, 84%, 4.9%);
-            --card-foreground: hsl(210, 40%, 98%);
-            --popover: hsl(222.2, 84%, 4.9%);
-            --popover-foreground: hsl(210, 40%, 98%);
-            --primary: hsl(210, 40%, 98%);
-            --primary-foreground: hsl(222.2, 47.4%, 11.2%);
-            --secondary: hsl(217.2, 32.6%, 17.5%);
-            --secondary-foreground: hsl(210, 40%, 98%);
-            --muted: hsl(217.2, 32.6%, 17.5%);
-            --muted-foreground: hsl(215, 20.2%, 65.1%);
-            --accent: hsl(217.2, 32.6%, 17.5%);
-            --accent-foreground: hsl(210, 40%, 98%);
-            --destructive: hsl(0, 62.8%, 30.6%);
-            --destructive-foreground: hsl(210, 40%, 98%);
-            --border: hsl(217.2, 32.6%, 17.5%);
-            --input: hsl(217.2, 32.6%, 17.5%);
-            --ring: hsl(212.7, 26.8%, 83.9%);
-        }
-
         /* Styles globaux */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            /*font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;*/
             font-family: "DM Sans", sans-serif;
             font-optical-sizing: auto;
         }
 
         body {
-            /*background-color: var(--background);*/
             color: var(--foreground);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
@@ -77,16 +54,27 @@
             background-size: 15px 15px;
         }
 
+        .page-header {
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
         .container {
             width: 100%;
             max-width: 800px;
             padding: 2rem;
+            background-color: white;
+            border-radius: var(--radius);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         h1 {
             font-size: 2.5rem;
             font-weight: 600;
-            margin-bottom: 1.5rem;
             color: var(--foreground);
         }
 
@@ -176,10 +164,69 @@
             animation: fadeIn 0.3s ease forwards;
         }
     </style>
+
+    <script src="https://unpkg.com/tone"></script>
+    <script>
+
+        function playMelody() {
+            // Créer un synthétiseur avec un peu de reverb pour un son plus agréable
+            const reverb = new Tone.Reverb({
+                decay: 2.5,
+                wet: 0.4
+            }).toDestination();
+            
+            const synth = new Tone.Synth({
+                oscillator: {
+                    type: "triangle"
+                },
+                envelope: {
+                    attack: 0.05,
+                    decay: 0.2,
+                    sustain: 0.4,
+                    release: 1.5
+                }
+            }).connect(reverb);
+            
+            // Définir les notes de la mélodie et leurs durées
+            const melody = [
+                { note: "G4", duration: "8n", time: 0 },
+                { note: "E4", duration: "8n", time: 0.25 },
+                { note: "G4", duration: "8n", time: 0.5 },
+                { note: "A4", duration: "8n", time: 0.75 },
+                { note: "B4", duration: "4n", time: 1.0 },
+                { note: "A4", duration: "8n", time: 1.5 },
+                { note: "G4", duration: "8n", time: 1.75 },
+                { note: "E4", duration: "8n", time: 2.0 },
+                { note: "D4", duration: "8n", time: 2.25 },
+                { note: "E4", duration: "8n", time: 2.5 },
+                { note: "G4", duration: "8n", time: 2.75 },
+                { note: "E4", duration: "4n", time: 3.0 },
+                { note: "D4", duration: "4n", time: 3.5 },
+                { note: "C4", duration: "2n", time: 4.0 }
+            ];
+            
+            // Obtenir le temps actuel comme point de référence
+            const now = Tone.now();
+            
+            // Planifier chaque note de la mélodie
+            melody.forEach(noteInfo => {
+                synth.triggerAttackRelease(
+                    noteInfo.note,
+                    noteInfo.duration,
+                    now + noteInfo.time
+                );
+            });
+        }
+    </script>
 </head>
 <body>
-    <div class="container">
+    <div class="page-header">
         <h1>Web sonore avec tone.js</h1>
+        <button class="button button-secondary" id="header-button" onclick="playMelody()">🎹</button>
+    </div>
+    
+    <div class="container">
+        <h2 style="margin-bottom: 1.5rem; font-size: 1.5rem;">Expérimentations</h2>
         <div class="list" id="list">
             <!-- Les éléments de liste seront ajoutés par JavaScript -->
         </div>
@@ -191,7 +238,7 @@
             {
                 title: "01 - Simple HTML5 Tone.js Demo",
                 description: "Démarrage basique avec tone.js et le fichier script.",
-                link: "/01/index.html"
+                link: "01/index.html"
             },
         ];
 
@@ -237,16 +284,20 @@
         }
 
         // Initialisation de la liste
-        document.addEventListener('DOMContentLoaded', renderList);
+        document.addEventListener('DOMContentLoaded', () => {
+            renderList();
+            
+            // Ajout d'un événement au bouton du header (si besoin d'actions supplémentaires)
+            document.getElementById('header-button').addEventListener('click', function() {
+                // Déjà géré par l'attribut onclick="playNote()"
+            });
+        });
 
         // Fonction pour ajouter un nouvel élément (exemple d'utilisation)
         function addItem(title, description, link) {
             listItems.push({ title, description, link });
             renderList();
         }
-
-        // Exemple: Pour ajouter un nouvel élément via la console:
-        // addItem("Nouveau Titre", "Description du nouvel élément", "#nouveau-lien");
     </script>
 </body>
 </html>
