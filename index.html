@@ -176,8 +176,8 @@
             }).toDestination();
             
             const filter = new Tone.Filter({
-                type: "lowpass",
-                frequency: 2200,
+                type: "notch",
+                frequency: 1200,
                 Q: 1
             }).connect(distortion);
             
